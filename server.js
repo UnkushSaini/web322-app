@@ -9,18 +9,23 @@ Date: 15/6/2024
 Vercel Web App URL: 
 GitHub Repository URL: 
 ********************************************************************************/
+
 const express = require('express');
-const app = express();
+const path = require('path');
 const storeService = require('./store-service');
 
+const app = express();
+
+// Middleware to serve static files
 app.use(express.static('public'));
 
+// Routes
 app.get('/', (req, res) => {
   res.redirect('/about');
 });
 
 app.get('/about', (req, res) => {
-  res.sendFile(__dirname + '/views/about.html');
+  res.sendFile(path.join(__dirname, 'views', 'about.html'));
 });
 
 app.get('/shop', (req, res) => {
@@ -29,6 +34,7 @@ app.get('/shop', (req, res) => {
       res.json(items);
     })
     .catch((err) => {
+      console.error('Error fetching published items:', err);
       res.status(500).json({ message: err });
     });
 });
@@ -39,6 +45,7 @@ app.get('/items', (req, res) => {
       res.json(items);
     })
     .catch((err) => {
+      console.error('Error fetching all items:', err);
       res.status(500).json({ message: err });
     });
 });
@@ -49,6 +56,7 @@ app.get('/categories', (req, res) => {
       res.json(categories);
     })
     .catch((err) => {
+      console.error('Error fetching categories:', err);
       res.status(500).json({ message: err });
     });
 });
@@ -57,6 +65,7 @@ app.use((req, res) => {
   res.status(404).send('Page Not Found');
 });
 
+// Initialize store service and start server
 storeService.initialize()
   .then(() => {
     const PORT = process.env.PORT || 8080;
